@@ -77,6 +77,9 @@ SetMassageIntensityAction = temperbridge_ns.class_(
 
 SetChannelAction = temperbridge_ns.class_("SetChannelAction", automation.Action)
 
+StartAutoLearnAction = temperbridge_ns.class_("StartAutoLearnAction", automation.Action)
+StopAutoLearnAction = temperbridge_ns.class_("StopAutoLearnAction", automation.Action)
+
 CONFIG_SCHEMA = (
     cv.Schema(
         {
@@ -188,4 +191,37 @@ async def temperbridge_set_massage_intensity_to_code(
 
     template_ = await cg.templatable(config[CONF_LEVEL], args, cg.uint8)
     cg.add(var.set_level(template_))
+    return var
+
+
+@automation.register_action(
+    "temperbridge.start_auto_learn",
+    StartAutoLearnAction,
+    cv.Schema(
+        {
+            cv.GenerateID(): cv.use_id(TemperBridge),
+        }
+    ),
+)
+async def temperbridge_start_auto_learn_to_code(
+        config, action_id, template_arg, args
+):
+    var = cg.new_Pvariable(action_id, template_arg)
+    await cg.register_parented(var, config[CONF_ID])
+    return var
+
+@automation.register_action(
+    "temperbridge.stop_auto_learn",
+    StopAutoLearnAction,
+    cv.Schema(
+        {
+            cv.GenerateID(): cv.use_id(TemperBridge),
+        }
+    ),
+)
+async def temperbridge_stop_auto_learn_to_code(
+        config, action_id, template_arg, args
+):
+    var = cg.new_Pvariable(action_id, template_arg)
+    await cg.register_parented(var, config[CONF_ID])
     return var

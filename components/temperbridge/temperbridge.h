@@ -67,17 +67,16 @@ class TemperBridgeComponent : public Component,
 
   void set_sdn_pin(GPIOPin *pin) { this->sdn_pin_ = pin; }
 
+  // Actions
   void execute_simple_command(SimpleCommand cmd);
-
   void start_positioning(PositionCommand cmd);
-
   void set_channel(uint16_t channel);
-
   void set_massage_level(MassageTarget target, uint8_t level);
+  void start_auto_learn();
+  void stop_auto_learn();
 
+protected:
   void si446x_get_int_status(Si446xGetIntStatusResp *ret, bool clear_pending);
-
- protected:
   void si446x_raw_command_(const uint8_t *tx_data, size_t tx_data_bytes, uint8_t *resp, size_t resp_bytes);
   void si446x_execute_command_(uint8_t command, const uint8_t *args, size_t arg_bytes, uint8_t *data, size_t data_bytes);
   Si446xChipInfoResp si446x_part_info_();
@@ -142,6 +141,16 @@ template<typename... Ts> class SetMassageIntensityAction : public Action<Ts...>,
     auto level = this->level_.value(x...);
     this->parent_->set_massage_level(target, level);
   }
+};
+
+template<typename... Ts> class StartAutoLearnAction : public Action<Ts...>, public Parented<TemperBridgeComponent> {
+public:
+  void play(Ts... x) override { this->parent_->start_auto_learn(); }
+};
+
+template<typename... Ts> class StopAutoLearnAction : public Action<Ts...>, public Parented<TemperBridgeComponent> {
+public:
+  void play(Ts... x) override { this->parent_->stop_auto_learn(); }
 };
 
 }  // namespace temperbridge
