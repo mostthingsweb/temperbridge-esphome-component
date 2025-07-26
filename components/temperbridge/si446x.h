@@ -17,45 +17,45 @@ namespace esphome {
 namespace temperbridge {
 
 struct Si446xChipInfoResp {
-  uint8_t chiprev;
-  uint16_t part;
-  uint8_t prbuild;
-  uint16_t id;
-  uint8_t customer;
-  uint8_t romid;
+    uint8_t chiprev;
+    uint16_t part;
+    uint8_t prbuild;
+    uint16_t id;
+    uint8_t customer;
+    uint8_t romid;
 } __attribute__((packed));
 
 struct Si446xGetIntStatusResp {
-  uint8_t int_pend;
-  uint8_t int_status;
-  uint8_t ph_pend;
-  uint8_t ph_status;
-  uint8_t modem_pend;
-  uint8_t modem_status;
-  uint8_t chip_pend;
-  uint8_t chip_status;
+    uint8_t int_pend;
+    uint8_t int_status;
+    uint8_t ph_pend;
+    uint8_t ph_status;
+    uint8_t modem_pend;
+    uint8_t modem_status;
+    uint8_t chip_pend;
+    uint8_t chip_status;
 
-  void print();
+    void print();
 } __attribute__((packed));
 
 struct Si446xFifoInfoResp {
-  uint8_t rx_fifo_count;
-  uint8_t tx_fifo_space;
+    uint8_t rx_fifo_count;
+    uint8_t tx_fifo_space;
 } __attribute__((packed));
 
 struct Si446xGetPropertyArgs {
-  uint8_t group;
-  uint8_t num_props;
-  uint8_t start_prop;
+    uint8_t group;
+    uint8_t num_props;
+    uint8_t start_prop;
 } __attribute__((packed));
 
 struct Si446xSetPropertyArgs {
-  uint8_t group;
-  uint8_t num_props;
-  uint8_t start_prop;
+    uint8_t group;
+    uint8_t num_props;
+    uint8_t start_prop;
 } __attribute__((packed));
 
-}  // namespace temperbridge
-}  // namespace esphome
+} // namespace temperbridge
+} // namespace esphome
 
-#endif  // TEMPERF_BRIDGE_ALEXA_SI446X_H
+#endif // TEMPERF_BRIDGE_ALEXA_SI446X_H
