@@ -50,6 +50,12 @@ struct TemperPacket {
   uint8_t crc;
 } PACKED;
 
+enum class State {
+	UNINITIALIZED,
+	IDLE,
+	AUTO_LEARN_BROADCASTING,
+};
+
 class TemperBridgeComponent : public Component,
                               public spi::SPIDevice<spi::BIT_ORDER_MSB_FIRST, spi::CLOCK_POLARITY_LOW,
                                                     spi::CLOCK_PHASE_LEADING, spi::DATA_RATE_4MHZ> {
@@ -89,7 +95,7 @@ class TemperBridgeComponent : public Component,
 
   void tune_channel_(uint16_t channel);
 
-  bool initialized_ = false;
+  State _state =  State::UNINITIALIZED;
 
   uint16_t channel_;
   InternalGPIOPin *interrupt_pin_;

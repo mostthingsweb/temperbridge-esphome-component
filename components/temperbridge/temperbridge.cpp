@@ -45,7 +45,7 @@ void TemperBridgeComponent::setup() {
   si446x_get_int_status(&int_status, true);
   //int_status.print();
 
-  this->initialized_ = true;
+  this->_state = State::IDLE;
 
   this->tune_channel_(this->channel_);
 }
@@ -342,7 +342,7 @@ void TemperBridgeComponent::loop() {
 
 void TemperBridgeComponent::set_channel(uint16_t channel) {
   this->channel_ = channel;
-  if (this->initialized_) {
+  if (this->_state == State::IDLE) {
     this->tune_channel_(channel);
   }
 }
