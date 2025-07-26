@@ -545,10 +545,23 @@ void TemperBridgeComponent::set_massage_level(MassageTarget target,
 
 void TemperBridgeComponent::start_auto_learn() {
     ESP_LOGI(TAG, "start auto learn process!");
+
+    if (_state == State::IDLE) {
+        this->tune_channel_(TEMPER_AUTO_LEARN_CHANNEL);
+
+        this->set_interval("auto_learn_broadcast", 40, [this]{
+            this->transmit_command_(TEMPER_CMD_AUTO_LEARN);
+        });
+
+        _state = State::AUTO_LEARN_BROADCASTING;
+    }
 }
 
 void TemperBridgeComponent::stop_auto_learn() {
     ESP_LOGI(TAG, "start auto learn process!");
+    this->cancel_interval("auto_learn_broadcast");
+    this->tune_channel_(this->channel_);
+    _state = State::IDLE;
 }
 
 } // namespace temperbridge
