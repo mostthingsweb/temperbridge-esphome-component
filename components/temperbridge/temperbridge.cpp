@@ -482,13 +482,13 @@ void TemperBridgeComponent::tune_channel_(uint16_t channel) {
 
     si446x_set_freq_control_properties_(calc_inte, calc_frac);
 
-    delay(50);
-
-    uint32_t read_frac;
-    uint8_t read_inte;
-    si446x_get_freq_control_properties_(&read_inte, &read_frac);
-    ESP_LOGI(TAG, "read frac: %08" PRIx32, read_frac);
-    ESP_LOGI(TAG, "read inte: %x", read_inte);
+    this->set_timeout(50, [this]() {
+        uint32_t read_frac;
+        uint8_t read_inte;
+        si446x_get_freq_control_properties_(&read_inte, &read_frac);
+        ESP_LOGI(TAG, "read frac: %08" PRIx32, read_frac);
+        ESP_LOGI(TAG, "read inte: %x", read_inte);
+    });
 }
 
 // This one seems to be used when making adjustments to built-in modes

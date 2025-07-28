@@ -5,6 +5,16 @@ substitutions:
 esphome:
   name: temperbridge
   name_add_mac_suffix: true
+  on_boot:
+    priority: 600
+    then:
+      - delay: 1s
+      - logger.log: "Restore channel on boot"
+      - lambda: |-
+          int channel = id(${devicename}_last_channel);
+          id(${devicename}_bed).set_channel(channel);
+
+
 
 esp32:
   board: esp32dev
@@ -68,10 +78,15 @@ binary_sensor:
       max_length: 30000ms
       then:
         - button.press: ${devicename}_factory_reset
-  - platform: template
-    id: ${devicename}_auto_learn_running
-    name: ${upper_devicename} Auto Learn Broadcasting
-    entity_category: config
+
+globals:
+    - id: ${devicename}_auto_learn_running
+      type: bool
+      initial_value: 'false'
+    - id: ${devicename}_last_channel
+      type: int
+      initial_value: '1'
+      restore_value: true
 
 temperbridge:
   id: ${devicename}_bed
@@ -110,21 +125,21 @@ switch:
     entity_category: config
 
     lambda: |-
-      return id(${devicename}_auto_learn_running).state;
+      return id(${devicename}_auto_learn_running);
 
     turn_on_action:
       - button.press: ${devicename}_stop
       - temperbridge.start_auto_learn:
           id: ${devicename}_bed
       - lambda: |-
-          id(${devicename}_auto_learn_running).publish_state(true);
+          id(${devicename}_auto_learn_running) = true;
       - logger.log: "Auto learn broadcast started"
 
     turn_off_action:
       - temperbridge.stop_auto_learn:
           id: ${devicename}_bed
       - lambda: |-
-          id(${devicename}_auto_learn_running).publish_state(false);
+          id(${devicename}_auto_learn_running) = false;
       - logger.log: "Auto learn broadcast stopped"
 
     icon: "mdi:broadcast"
@@ -348,26 +363,35 @@ button:
       - temperbridge.position_command_2:
           id: ${devicename}_bed
           cmd: "lower_legs"
+
+
 number:
   - platform: template
-    # Example number configuration
+    id: ${devicename}_channel_number
     name: ${upper_devicename} Channel
 
-    # Optional variables:
     icon: "mdi:counter"
 
     min_value: 1
     max_value: 9999
     step: 1
-    optimistic: true
+    optimistic: false
     restore_value: true
     mode: box
 
-    on_value:
+    set_action:
       then:
-        - temperbridge.set_channel:
-            id: ${devicename}_bed
-            channel: !lambda "return x;"
+        - if:
+            condition:
+              lambda: 'return id(${devicename}_auto_learn_running);'
+            then:
+              - logger.log: "Change rejected! Auto learn is in progress"
+            else:
+              - lambda: |-
+                  int new_channel = int(x);
+                  id(${devicename}_bed).set_channel(new_channel);
+                  id(${devicename}_channel_number)->publish_state(new_channel);
+                  id(${devicename}_last_channel) = new_channel;
 
   - platform: template
     name: ${upper_devicename} Head Massage Intensity
