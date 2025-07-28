@@ -103,7 +103,7 @@ class TemperBridgeComponent
 
     State _state = State::UNINITIALIZED;
 
-    uint16_t channel_;
+    uint16_t channel_ = 1;
     InternalGPIOPin *interrupt_pin_;
     GPIOPin *sdn_pin_;
 

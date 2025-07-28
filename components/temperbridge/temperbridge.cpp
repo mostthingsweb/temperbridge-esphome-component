@@ -182,9 +182,6 @@ enum class TemperCommand : uint32_t {
     MASSAGE_MODE_4 = 0X968D0378
 };
 
-#define TEMPER_CMD_AUTO_LEARN 0x96000000
-#define TEMPER_AUTO_LEARN_CHANNEL 5568
-
 // CRC table generated from
 // http://www.sunshine2k.de/coding/javascript/crc/crc_js.html The parameters
 // were reversed using http://reveng.sourceforge.net/ Poly: 0x8D, initial: 0xFF
@@ -543,6 +540,9 @@ void TemperBridgeComponent::set_massage_level(MassageTarget target,
     }
 }
 
+#define TEMPER_CMD_AUTO_LEARN 0x96000000
+#define TEMPER_AUTO_LEARN_CHANNEL 5568
+
 void TemperBridgeComponent::start_auto_learn() {
     ESP_LOGI(TAG, "start auto learn process!");
 
@@ -558,10 +558,12 @@ void TemperBridgeComponent::start_auto_learn() {
 }
 
 void TemperBridgeComponent::stop_auto_learn() {
-    ESP_LOGI(TAG, "start auto learn process!");
-    this->cancel_interval("auto_learn_broadcast");
-    this->tune_channel_(this->channel_);
-    _state = State::IDLE;
+    if (_state == State::AUTO_LEARN_BROADCASTING) {
+        ESP_LOGI(TAG, "stop auto learn process!");
+        this->cancel_interval("auto_learn_broadcast");
+        this->tune_channel_(this->channel_);
+        _state = State::IDLE;
+    }
 }
 
 } // namespace temperbridge
